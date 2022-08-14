@@ -17,8 +17,8 @@ Page({
       url: '../logs/logs',
     })
   },
-  onLoad() {
-    app.globalData.userInfo.then(userInfo => {
+  async onLoad() {
+    await app.globalData.userInfo.then(userInfo => {
       this.setData({
         userInfo,
         hasUserInfo: true

@@ -29,7 +29,7 @@ App<IAppOption>({
     //   }).catch(reject)
     // })
   },
-  onLaunch() {
+  async onLaunch() {
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
     logs.unshift(Date.now())
@@ -45,23 +45,31 @@ App<IAppOption>({
 
 
     //将最初的globalData中的userInfo思路修改为使用 resolveUserInfo = resolve，rejectUserInfo = reject暴露给外部去处理
-
-    getUserSetting().then(res=>{
-      if (res.authSetting['scope.userInfo']){
-        return getUserInfo()
+    try {
+      const setting = await  getUserSetting()
+      if (setting.authSetting['scope.userInfo']) {
+        const  userInfoRes = await getUserInfo()
+        resolveUserInfo(userInfoRes.userInfo)
       }
-      return Promise.resolve(undefined)
-    }).then(res => {
-      if (!res) {
-        return
-      }
-      // this.globalData.userInfo = res?.userInfo
-      // if (this.userInfoReadyCallback) {
-      //   this.userInfoReadyCallback(res)
-      // }
-      // resolve(res.userInfo)
-      return resolveUserInfo
-    }).catch(rejectUserInfo)
+    } catch (error) {
+      rejectUserInfo(error)
+    }
+    // getUserSetting().then(res=>{
+    //   if (res.authSetting['scope.userInfo']){
+    //     return getUserInfo()
+    //   }
+    //   return Promise.resolve(undefined)
+    // }).then(res => {
+    //   if (!res) {
+    //     return
+    //   }
+    //   // this.globalData.userInfo = res?.userInfo
+    //   // if (this.userInfoReadyCallback) {
+    //   //   this.userInfoReadyCallback(res)
+    //   // }
+    //   // resolve(res.userInfo)
+    //   return resolveUserInfo
+    // }).catch(rejectUserInfo)
     
   },
   resolveUserInfo(userInfo: WechatMiniprogram.UserInfo){
