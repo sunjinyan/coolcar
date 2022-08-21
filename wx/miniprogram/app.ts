@@ -1,3 +1,4 @@
+import { IAppOption } from "./appoption"
 import { getUserInfo, getUserSetting } from "./utils/util"
 // app.ts
 

@@ -1,9 +1,14 @@
 {
     "pages": [
         "pages/index/index",
+        "pages/register/register",
+        "pages/driving/driving",
+        "pages/lock/lock",
+        "pages/mytrips/mytrips",
         "pages/logs/logs",
         "pages/index1/index1",
-        "pages/register/register"
+        "pages/index2/index2",
+        "pages/register1/register1"
     ],
     "window": {
         "backgroundTextStyle": "light",
