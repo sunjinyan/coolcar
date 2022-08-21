@@ -5,12 +5,12 @@ let  resolveUserInfo: (value: WechatMiniprogram.UserInfo | PromiseLike<WechatMin
 let  rejectUserInfo: (reason?: any) => void
 App<IAppOption>({
   globalData: {
-    userInfo: new Promise((resolve,reject)=>{//为了保持同步，所以需要将结果使用Promise来进行操作
+    userInfo: new Promise<WechatMiniprogram.UserInfo>((resolve,reject)=>{//为了保持网络信息同步返回，页面与所需数据顺序加载，所以需要将结果使用Promise来进行操作
       resolveUserInfo = resolve
       rejectUserInfo = reject
     })
     //起初最开始的思路
-    // userInfo: new Promise((resolve,reject)=>{//为了保持同步，所以需要将结果使用Promise来进行操作
+    // userInfo: new Promise((resolve,reject)=>{//为了保持网络信息同步返回，页面与所需数据顺序加载，所以需要将结果使用Promise来进行操作
     //   getUserSetting().then(res=>{
     //     if (res.authSetting['scope.userInfo']){
     //       return getUserInfo()
