@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"coolcar/shared/auth/token"
+	"coolcar/shared/id"
 	"crypto/rsa"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
@@ -68,7 +69,7 @@ func  (i *authInterceptor) GetResInter(ctx context.Context, req interface{}, inf
 		return "",fmt.Errorf("cannot get aid from token")
 	}
 	//将aid传递到下一个函数
-	return handler(createContextWithAid(ctx,aid),req)
+	return handler(createContextWithAid(ctx,id.AccountID(aid)),req)
 }
 
 //将aid强制类型转化
@@ -76,15 +77,17 @@ type aidKey struct {
 
 }
 
-func createContextWithAid(ctx context.Context, aid string) context.Context {
+
+
+func createContextWithAid(ctx context.Context, aid id.AccountID) context.Context {
 	ctx  = context.WithValue(ctx,aidKey{},aid)
 	return ctx
 }
 
-func GetAidFromContext(ctx context.Context) (string,error) {
+func GetAidFromContext(ctx context.Context) (id.AccountID,error) {
 	aid := ctx.Value(aidKey{})
 
-	id,ok := aid.(string);
+	id,ok := aid.(id.AccountID)
 	if  !ok  {
 		return "",fmt.Errorf("cannot get aid from context")
 	}

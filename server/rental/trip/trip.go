@@ -3,8 +3,9 @@ package trip
 import (
 	"context"
 	rentalpb "coolcar/rental/api/gen/v1"
-	"coolcar/shared/auth"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Service struct {
@@ -12,14 +13,20 @@ type Service struct {
 	rentalpb.UnimplementedTripServiceServer
 }
 
-func (s *Service) CreateTrip(ctx context.Context,req *rentalpb.CreateTripRequest) (res *rentalpb.CreateTripResponse, err error)  {
 
-	//获取行程，首先需要获取Aid
-	aid, err := auth.GetAidFromContext(ctx)
-	if err != nil {
-		s.Logger.Fatal("cannot get aid from context ")
-	}
+func (s *Service) CreateTrip(context.Context, *rentalpb.CreateTripRequest) (*rentalpb.TripEntity, error){
 
-	s.Logger.Info("create trip ",zap.String("start",req.Start),zap.String("aid",aid))
-	return &rentalpb.CreateTripResponse{}, nil
+	return nil, status.Error(codes.Unimplemented,"")
+}
+func (s *Service) GetTrip(context.Context, *rentalpb.GetTripRequest) (*rentalpb.Trip, error){
+
+	return nil, status.Error(codes.Unimplemented,"")
+}
+func (s *Service) GetTrips(context.Context, *rentalpb.GetTripsRequest) (*rentalpb.TripsRecord, error){
+
+	return nil, status.Error(codes.Unimplemented,"")
+}
+func (s *Service) UpdateTrip(context.Context, *rentalpb.UpdateTripsRequest) (*rentalpb.Trip, error){
+
+	return nil, status.Error(codes.Unimplemented,"")
 }

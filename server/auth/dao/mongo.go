@@ -2,7 +2,7 @@ package dao
 
 import (
 	"context"
-	mgo "coolcar/shared"
+	"coolcar/shared/mgoutil"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,11 +25,13 @@ func (m *Mongo)ResolveAccountID(ctx context.Context,openID string) (ObjectID str
 
 	var Upsert bool = true
 	var ReturnDocument options.ReturnDocument = options.After
+	insertedID := mgoutil.NewObjId()
 	res := m.col.FindOneAndUpdate(ctx, bson.M{
 		openIDField: openID,
 	},
-	mgo.Set(bson.M{
-			openIDField: openID,
+		mgoutil.SetOnInsert(bson.M{
+		mgoutil.IDFieldName: insertedID,
+			openIDField:        openID,
 	}),
 	&options.FindOneAndUpdateOptions{
 		ReturnDocument: &ReturnDocument,
@@ -38,7 +40,7 @@ func (m *Mongo)ResolveAccountID(ctx context.Context,openID string) (ObjectID str
 	if err := res.Err(); err != nil {
 		return "",fmt.Errorf("cannot find one and update: %v",err)
 	}
-	var row mgo.ObjID
+	var row mgoutil.IDField
 	err = res.Decode(&row)
 	if err != nil {
 		return "",fmt.Errorf("cannot find one and update: %v",err)
