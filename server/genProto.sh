@@ -21,6 +21,7 @@ function genProto() {
 
   mkdir -p $PBTS_OUT_DIR
 
+  ##放弃long类型  --force-number
   $PBTS_BIN_DIR/pbjs -t static -w es6 $PROTO_PATH/${DOMAIN}.proto --no-create --no-encode --no-decode --no-verify --no-delimited --force-number -o  $PBTS_OUT_DIR/${DOMAIN}_pb_tmp.js
 
   echo 'import * as $protobuf from "protobufjs";' > $PBTS_OUT_DIR/${DOMAIN}_pb.js

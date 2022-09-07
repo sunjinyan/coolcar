@@ -19,3 +19,17 @@ type TripID string
 func (t TripID)String() string  {
 	return  string(t)
 }
+
+
+type CarID string
+
+func (t CarID)String() string  {
+	return  string(t)
+}
+
+
+type IdentityID string
+
+func (t IdentityID)String() string  {
+	return  string(t)
+}

@@ -1,12 +1,24 @@
 package main
 
 import (
+	"context"
+	"coolcar/rental/ai"
 	rentalpb "coolcar/rental/api/gen/v1"
 	"coolcar/rental/trip"
+	"coolcar/rental/trip/client/car"
+	"coolcar/rental/trip/client/poi"
+	"coolcar/rental/trip/client/profile"
+	"coolcar/rental/trip/dao"
+	coolenvpb "coolcar/shared/coolenv"
 	"coolcar/shared/server"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
+	"time"
 )
 
 func main() {
@@ -44,7 +56,37 @@ func main() {
 
 	logger.Sugar().Fatalf("start trip service error",zap.Error(srv.Serve(lis)))
 	***********************************将所有的grpc服务启动注册动作统一整理到一起去，因为所有的形似都差不多，只是参数不同**************************************************/
+	ctx := context.Background()
+	var timer   time.Duration = 5*time.Second
+	var MaxPoolSize   uint64 = 100
+	var MinPoolSize   uint64 = 50
+	pref, err := readpref.New(readpref.PrimaryMode)
+	if err != nil {
+		logger.Fatal("readpref primary mode,error message ",zap.Error(err))
+	}
+	con, err := mongo.Connect(ctx, &options.ClientOptions{
+		ConnectTimeout:           &timer,
+		Hosts:                    []string{
+			"47.93.20.75:27017",
+		},
+		MaxPoolSize:              &MaxPoolSize,
+		MinPoolSize:              &MinPoolSize,
+		ReadPreference:  pref,
+	})
+	if err != nil {
+		logger.Fatal("cannot Connect",zap.Error(err))
+	}
 
+
+	//coolenv
+	conn,err := grpc.Dial("47.93.20.75:18001",grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Fatal("cannot AIClient",zap.Error(err))
+	}
+
+
+	db := con.Database("coolcar")
+	mon := dao.NewMongo(db)
 	logger.Sugar().Fatalf("start trip service error",zap.Error(server.RUNGrpcServer(&server.RunGrpcServerConfig{
 		NetWork:      "tcp",
 		Addr:         ":8082",
@@ -55,6 +97,11 @@ func main() {
 
 			rentalpb.RegisterTripServiceServer(srv,&trip.Service{
 				Logger:                         logger,
+				CarManager: &car.Manager{},
+				ProfileManager: &profile.Manager{},
+				POIManager: &poi.Manager{},
+				Mongo: mon,
+				DistanceCalc: &ai.Client{AIClient: coolenvpb.NewAIServiceClient(conn)},
 			})
 
 		},

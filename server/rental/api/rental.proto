@@ -35,9 +35,10 @@ message Location {
 
 message LocationStatus {
     Location location = 1;
-    int32  fee_cent = 2;
-    double  km_driven = 3;
-    string poi_name = 5;
+    int32 fee_cent = 2;//应该是服务器计算的，不应该是填写的
+    double  km_driven = 3;//应该是服务器计算的，不应该是填写的
+    string  poi_name = 4;
+    int64 timestamp_sec = 5;
 }
 
 enum TripStatus {
@@ -64,6 +65,7 @@ message Trip {
     LocationStatus current = 5;
     LocationStatus end = 4;
     TripStatus status = 6;
+    string identity_id = 7;
 }
 
 
@@ -74,7 +76,7 @@ message CreateTripRequest{
     //Trip trip = 1;
     Location start = 1;
     string car_id = 2;
-    string poi_name = 3;
+    string  avatar_url = 3;
     //account_id也不用传递，我自己解出来，因为可能是别人的account_id
 }
 
@@ -91,7 +93,7 @@ message GetTripsRequest{
     TripStatus status = 1;//这里只为了满足根据状态去查找列表，不管是根据id还是根据状态，都可以不填，不填就是拿全部
 }
 
-message TripsRecord {
+message GetTripsResponse {
     repeated TripEntity trips = 1;
 }
 
@@ -107,6 +109,102 @@ message UpdateTripsRequest {
 service TripService {
     rpc CreateTrip (CreateTripRequest) returns (TripEntity);
     rpc GetTrip (GetTripRequest) returns (Trip);//没必要返回ID？
-    rpc GetTrips (GetTripsRequest) returns (TripsRecord);
+    rpc GetTrips (GetTripsRequest) returns (GetTripsResponse);
     rpc UpdateTrip (UpdateTripsRequest) returns (Trip);
+}
+
+
+//Profile Service
+
+enum Gender {
+    G_NOT_SPECIFIED=0;
+    MALE=1;
+    FEMALE=2;
+}
+
+enum IdentityStatus {
+    UNSUBMITED = 0;
+}
+
+message  Identity {
+    string lic_number=1;
+    string name = 2;
+    Gender gender = 3;
+    int64 birth_date_millis = 4;
+}
+/**
+值类型 一个account_id 可以映射到的信息，给一个account_id可以联想到的事物
+实体 具有生命周期，可以一开始被创建、修改除id以外的字段、最后销毁或结束，具有时效比较短的周期性，因为实体具有生命周期，向服务器询问的时候需要
+返回具体的实体信息，没有需要报错，而值类型则返回空profile，所以Profile更倾向值类型，可以为空Profile而不是返回nil报错
+*/
+message Profile {
+    Identity identity = 1;
+
+    //需要参与很多业务逻辑,所以不写在Identity中
+    IdentityStatus identity_status = 2;
+}
+
+
+message GetProfileRequest {
+
+}
+
+message ClearProfileRequest{
+
+}
+
+
+message GetProfilePhotoRequest{
+
+}
+message GetProfilePhotoResponse{
+    string url = 1;
+}
+
+message CreateProfilePhotoRequest {
+
+}
+
+message CreateProfilePhotoResponse{
+    string upload_url = 1;
+}
+
+message CompleteProfilePhotoRequest {
+
+}
+//message CompleteProfilePhotoResponse{
+//    Identity identity = 1;
+//}
+
+message ClearProfilePhotoRequest {
+
+}
+
+message ClearProfilePhotoResponse {
+
+}
+
+
+message UploadFilePhotoRequest {
+    string file_name = 1;
+}
+
+message UploadFilePhotoResponse {
+    string url=1;
+}
+
+service ProfileService{
+    rpc GetProfile(GetProfileRequest) returns (Profile);
+    rpc SubmitProfile(Identity) returns (Profile);
+    rpc ClearProfile(ClearProfileRequest) returns (Profile);
+
+
+
+    rpc GetProfilePhoto(GetProfilePhotoRequest) returns (GetProfilePhotoResponse);
+    rpc CreateProfilePhoto(CreateProfilePhotoRequest) returns (CreateProfilePhotoResponse);
+    rpc CompleteProfilePhoto(CompleteProfilePhotoRequest) returns (Identity);
+    rpc ClearProfilePhoto (ClearProfilePhotoRequest) returns (ClearProfilePhotoResponse);
+
+
+    rpc UploadFilePhoto(UploadFilePhotoRequest) returns (UploadFilePhotoResponse);
 }
