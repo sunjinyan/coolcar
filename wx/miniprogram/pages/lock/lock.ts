@@ -58,7 +58,7 @@ Page({
                 //console.log("============================",loc)
                 let trip: rental.v1.ITripEntity
                 try {
-                    trip = await TripService.createTrip({
+                    trip = await TripService.CreateTrip({
                         //start:"abc"
                         start:{
                             latitude:loc.latitude,
