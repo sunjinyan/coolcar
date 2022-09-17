@@ -8,7 +8,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"golang.org/x/net/websocket"
 	"os"
 	"os/signal"
 	"time"
@@ -56,12 +55,7 @@ func mongoConn()  {
 			MinPoolSize:              &MinPoolSize,
 			ReadPreference:  pref,
 		})
-aa := websocket.Server{
-	Config:    websocket.Config{},
-	Handshake: nil,
-	Handler:   nil,
-}
-aa.ServeHTTP()
+
 		if err != nil {
 			fmt.Println(err.Error())
 			singleCh <- os.Interrupt
