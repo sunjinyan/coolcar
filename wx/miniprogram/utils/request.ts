@@ -2,7 +2,7 @@ import camelcaseKeys from "camelcase-keys"
 import { auth } from "../service/proto_gen/auth/auth_pb"
 
 export  namespace Coolcar {
-    const  url: string = "http://localhost:8080"
+    const  url: string = "http://coolcar.dreaminglifes.com"
     let   token: string = ""
     let   expire: number = 0
     //统一处理请求
